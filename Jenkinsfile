@@ -86,8 +86,8 @@ pipeline {
           docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:latest
 
           # WEB
-          docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-web:${FULL_TAG}
-          docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-web:latest
+          docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:${FULL_TAG}
+          docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:latest
         '''
       }
     }
