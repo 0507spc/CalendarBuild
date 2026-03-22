@@ -7,7 +7,6 @@ pipeline {
     REGISTRY_REPO  = 'ios'
     IMAGE_NAME     = 'calendar-app'  // Fixed: valid Docker image name
     REMOTE_REPO   = 'https://github.com/0507spc/Calendar-App.git'
-    GIT_HASH       = "${sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()}"
     BUILD_TAG      = "${BUILD_NUMBER}"
     FULL_TAG       = "${GIT_HASH}-${BUILD_TAG}"
     DOCKER_IMAGE   = "${REGISTRY_URL}/${REGISTRY_REPO}/${IMAGE_NAME}:${FULL_TAG}"
@@ -22,6 +21,15 @@ pipeline {
     timestamps()
   }
 
+stage('Prepare') {
+  steps {
+    script {
+      env.GIT_HASH = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+      env.FULL_TAG = "${env.GIT_HASH}-${env.BUILD_NUMBER}"
+    }
+  }
+}
+  
   stages {
     stage('Clone Remote Repo') {
       steps {
@@ -47,14 +55,21 @@ pipeline {
 
     
     
-    stage('Tag Images for Nexus') {
-      steps {
-        sh '''
-          docker tag ${IMAGE_NAME}:${FULL_TAG} "${DOCKER_IMAGE}"
-          docker tag ${IMAGE_NAME}:${FULL_TAG} "${LATEST_IMAGE}"
-        '''
-      }
-    }
+stage('Tag Images for Nexus') {
+  steps {
+    sh '''
+      # API
+      docker tag calendar-api ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-api:${FULL_TAG}
+      docker tag calendar-api ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-api:latest
+
+      # WEB
+      docker tag calendar-web ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-web:${FULL_TAG}
+      docker tag calendar-web ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-web:latest
+    '''
+  }
+}
+
+
         
     stage('Login to Nexus') {
       steps {
@@ -70,15 +85,19 @@ pipeline {
       }
     }
 
-    stage('Push to Nexus') {
-      steps {
-        sh '''
-          docker push "${DOCKER_IMAGE}"
-          docker push "${LATEST_IMAGE}"
-        '''
-      }
-    }
+stage('Push to Nexus') {
+  steps {
+    sh '''
+      # API
+      docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-api:${FULL_TAG}
+      docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-api:latest
+
+      # WEB
+      docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-web:${FULL_TAG}
+      docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-web:latest
+    '''
   }
+}
 
   post {
     always {
