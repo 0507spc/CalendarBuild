@@ -54,12 +54,12 @@ pipeline {
       steps {
         sh '''
           # API
-          docker tag calendar-api ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-api:${FULL_TAG}
-          docker tag calendar-api ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-api:latest
+          docker tag calendar-api ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:${FULL_TAG}
+          docker tag calendar-api ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:latest
 
           # WEB
-          docker tag calendar-web ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-web:${FULL_TAG}
-          docker tag calendar-web ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-web:latest
+          docker tag calendar-web ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:${FULL_TAG}
+          docker tag calendar-web ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:latest
         '''
       }
     }
