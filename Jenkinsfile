@@ -1,6 +1,15 @@
 // Jenkinsfile at repo root (same level as Dockerfile and docker-compose.yml)
 pipeline {
   agent { label 'miniserver' }
+
+stage('Prepare') {
+  steps {
+    script {
+      env.GIT_HASH = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+      env.FULL_TAG = "${env.GIT_HASH}-${env.BUILD_NUMBER}"
+    }
+  }
+}
   
   environment {
     REGISTRY_URL   = 'nexus.server.cranie.com'
@@ -21,14 +30,7 @@ pipeline {
     timestamps()
   }
 
-stage('Prepare') {
-  steps {
-    script {
-      env.GIT_HASH = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-      env.FULL_TAG = "${env.GIT_HASH}-${env.BUILD_NUMBER}"
-    }
-  }
-}
+
   
   stages {
     stage('Clone Remote Repo') {
