@@ -36,7 +36,7 @@ pipeline {
       steps {
         dir('Calendar-App') {
           sh '''
-            docker compose --build --no-cache -t ${IMAGE_NAME}:${FULL_TAG}
+            docker compose build --no-cache -t ${IMAGE_NAME}:${FULL_TAG}
           '''
         }
       }
