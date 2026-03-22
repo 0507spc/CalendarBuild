@@ -3,7 +3,7 @@ pipeline {
 
   environment {
     REGISTRY_URL  = 'nexus.server.cranie.com'
-    REGISTRY_REPO = 'ios'
+    REGISTRY_REPO = 'docker'
     REMOTE_REPO   = 'https://github.com/0507spc/Calendar-App.git'
   }
 
