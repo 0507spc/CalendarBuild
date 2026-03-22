@@ -54,12 +54,12 @@ pipeline {
       steps {
         sh '''
           # API
-          docker tag calendar-api ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:${FULL_TAG}
-          docker tag calendar-api ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:latest
+          docker tag calendar-app-api ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:${FULL_TAG}
+          docker tag calendar-app-api ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:latest
 
           # WEB
-          docker tag calendar-web ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:${FULL_TAG}
-          docker tag calendar-web ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:latest
+          docker tag calendar-app-web ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:${FULL_TAG}
+          docker tag calendar-app-web ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:latest
         '''
       }
     }
@@ -82,8 +82,8 @@ pipeline {
       steps {
         sh '''
           # API
-          docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-api:${FULL_TAG}
-          docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-api:latest
+          docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:${FULL_TAG}
+          docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:latest
 
           # WEB
           docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-web:${FULL_TAG}
