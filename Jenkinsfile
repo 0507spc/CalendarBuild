@@ -5,7 +5,7 @@ pipeline {
   environment {
     REGISTRY_URL   = 'nexus.server.cranie.com'
     REGISTRY_REPO  = 'ios'
-    IMAGE_NAME     = 'Calendar-App'  // Fixed: valid Docker image name
+    IMAGE_NAME     = 'calendar-app'  // Fixed: valid Docker image name
     REMOTE_REPO   = 'https://github.com/0507spc/Calendar-App.git'
     GIT_HASH       = "${sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()}"
     BUILD_TAG      = "${BUILD_NUMBER}"
