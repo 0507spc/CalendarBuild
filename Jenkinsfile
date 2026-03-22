@@ -17,7 +17,6 @@ stage('Prepare') {
     IMAGE_NAME     = 'calendar-app'  // Fixed: valid Docker image name
     REMOTE_REPO   = 'https://github.com/0507spc/Calendar-App.git'
     BUILD_TAG      = "${BUILD_NUMBER}"
-    FULL_TAG       = "${GIT_HASH}-${BUILD_TAG}"
     DOCKER_IMAGE   = "${REGISTRY_URL}/${REGISTRY_REPO}/${IMAGE_NAME}:${FULL_TAG}"
     LATEST_IMAGE   = "${REGISTRY_URL}/${REGISTRY_REPO}/${IMAGE_NAME}:latest"
   }
