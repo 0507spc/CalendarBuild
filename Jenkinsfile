@@ -1,17 +1,10 @@
-// Jenkinsfile at repo root (same level as Dockerfile and docker-compose.yml)
 pipeline {
   agent { label 'miniserver' }
 
   environment {
-    REGISTRY_URL   = 'nexus.server.cranie.com'
-    REGISTRY_REPO  = 'ios'
-    IMAGE_NAME     = 'calendar-app'  // Fixed: valid Docker image name
-    REMOTE_REPO    = 'https://github.com/0507spc/Calendar-App.git'
-    GIT_HASH       = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-    FULL_TAG       = "${env.GIT_HASH}-${env.BUILD_NUMBER}"
-    BUILD_TAG      = "${BUILD_NUMBER}"
-    DOCKER_IMAGE   = "${REGISTRY_URL}/${REGISTRY_REPO}/${IMAGE_NAME}:${FULL_TAG}"
-    LATEST_IMAGE   = "${REGISTRY_URL}/${REGISTRY_REPO}/${IMAGE_NAME}:latest"
+    REGISTRY_URL  = 'nexus.server.cranie.com'
+    REGISTRY_REPO = 'ios'
+    REMOTE_REPO   = 'https://github.com/0507spc/Calendar-App.git'
   }
 
   triggers {
@@ -22,19 +15,32 @@ pipeline {
     timestamps()
   }
 
-
-  
   stages {
-    stage('Clone Remote Repo') {
+
+    stage('Clone Repo') {
       steps {
-        dir('Calendar-App') {  // Clone into subdir
-          git url: "${REMOTE_REPO}", branch: 'main'  // or 'main'
+        dir('Calendar-App') {
+          git url: "${REMOTE_REPO}", branch: 'main'
         }
       }
     }
 
-    
-    stage('Docker Build') {
+    stage('Prepare Tags') {
+      steps {
+        dir('Calendar-App') {
+          script {
+            env.GIT_HASH = sh(
+              returnStdout: true,
+              script: 'git rev-parse --short HEAD'
+            ).trim()
+
+            env.FULL_TAG = "${env.GIT_HASH}-${env.BUILD_NUMBER}"
+          }
+        }
+      }
+    }
+
+    stage('Build Images') {
       steps {
         dir('Calendar-App') {
           sh '''
@@ -44,27 +50,20 @@ pipeline {
       }
     }
 
+    stage('Tag Images') {
+      steps {
+        sh '''
+          # API
+          docker tag calendar-api ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-api:${FULL_TAG}
+          docker tag calendar-api ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-api:latest
 
-
-
-    
-    
-  stage('Tag Images for Nexus') {
-    steps {
-      sh '''
-        # API
-        docker tag calendar-api ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-api:${FULL_TAG}
-        docker tag calendar-api ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-api:latest
-  
-        # WEB
-        docker tag calendar-web ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-web:${FULL_TAG}
-        docker tag calendar-web ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-web:latest
-      '''
+          # WEB
+          docker tag calendar-web ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-web:${FULL_TAG}
+          docker tag calendar-web ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-web:latest
+        '''
+      }
     }
-  }
 
-
-        
     stage('Login to Nexus') {
       steps {
         withCredentials([usernamePassword(
@@ -79,17 +78,18 @@ pipeline {
       }
     }
 
-  stage('Push to Nexus') {
-    steps {
-      sh '''
-        # API
-        docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-api:${FULL_TAG}
-        docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-api:latest
-  
-        # WEB
-        docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-web:${FULL_TAG}
-        docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-web:latest
-      '''
+    stage('Push Images') {
+      steps {
+        sh '''
+          # API
+          docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-api:${FULL_TAG}
+          docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-api:latest
+
+          # WEB
+          docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-web:${FULL_TAG}
+          docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-web:latest
+        '''
+      }
     }
   }
 
