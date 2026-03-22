@@ -26,7 +26,7 @@ pipeline {
     stage('Clone Remote Repo') {
       steps {
         dir('Calendar-App') {  // Clone into subdir
-          git url: "${REMOTE_REPO}", branch: 'master'  // or 'main'
+          git url: "${REMOTE_REPO}", branch: 'main'  // or 'main'
         }
       }
     }
