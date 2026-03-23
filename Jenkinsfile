@@ -50,21 +50,21 @@ pipeline {
       }
     }
 
-    stage('Tag Images') {
-      steps {
-        dir('Calendar-App') {
-          sh '''
-            # API
-            docker tag calendar-app-api ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:${FULL_TAG}
-            docker tag calendar-app-api ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:latest
+    // stage('Tag Images') {
+    //   steps {
+    //     dir('Calendar-App') {
+    //       sh '''
+    //         # API
+    //         docker tag calendar-app-api ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:${FULL_TAG}
+    //         docker tag calendar-app-api ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:latest
 
-            # WEB
-            docker tag calendar-app-web ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:${FULL_TAG}
-            docker tag calendar-app-web ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:latest
-          '''
-        }
-      }
-    }
+    //         # WEB
+    //         docker tag calendar-app-web ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:${FULL_TAG}
+    //         docker tag calendar-app-web ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:latest
+    //       '''
+    //     }
+    //   }
+    // }
 
     stage('Login to Nexus') {
       steps {
@@ -80,23 +80,48 @@ pipeline {
       }
     }
 
+
     stage('Push Images') {
       steps {
         dir('Calendar-App') {
           sh '''
-            docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:${FULL_TAG}
-            docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:${FULL_TAG}
-
-            docker tag ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:${FULL_TAG} ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:latest
-            docker tag ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:${FULL_TAG} ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:latest
-
-            docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:latest
-            docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:latest
+            TAG=${FULL_TAG} docker compose push
           '''
         }
       }
     }
-  }
+
+    stage('Tag Latest') {
+      steps {
+        sh '''
+          docker tag ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:${FULL_TAG} ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:latest
+          docker tag ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:${FULL_TAG} ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:latest
+
+          docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:latest
+          docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:latest
+        '''
+      }
+    }
+
+  //   stage('Push Images') {
+  //     steps {
+  //       dir('Calendar-App') {
+  //         sh '''
+  //           docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:${FULL_TAG}
+  //           docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:${FULL_TAG}
+
+  //           docker tag ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:${FULL_TAG} ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:latest
+  //           docker tag ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:${FULL_TAG} ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:latest
+
+  //           docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:latest
+  //           docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:latest
+  //         '''
+  //       }
+  //     }
+  //   }
+  // }
+
+
   post {
     always {
       sh 'docker logout ${REGISTRY_URL} || true'
