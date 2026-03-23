@@ -96,7 +96,7 @@ pipeline {
         }
       }
     }
-
+  }
   post {
     always {
       sh 'docker logout ${REGISTRY_URL} || true'
