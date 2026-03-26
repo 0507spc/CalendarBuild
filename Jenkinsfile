@@ -50,22 +50,6 @@ pipeline {
       }
     }
 
-    // stage('Tag Images') {
-    //   steps {
-    //     dir('Calendar-App') {
-    //       sh '''
-    //         # API
-    //         docker tag calendar-app-api ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:${FULL_TAG}
-    //         docker tag calendar-app-api ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:latest
-
-    //         # WEB
-    //         docker tag calendar-app-web ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:${FULL_TAG}
-    //         docker tag calendar-app-web ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:latest
-    //       '''
-    //     }
-    //   }
-    // }
-
     stage('Login to Nexus') {
       steps {
         withCredentials([usernamePassword(
@@ -103,22 +87,13 @@ pipeline {
       }
     }
 
-  //   stage('Push Images') {
-  //     steps {
-  //       dir('Calendar-App') {
-  //         sh '''
-  //           docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:${FULL_TAG}
-  //           docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:${FULL_TAG}
 
-  //           docker tag ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:${FULL_TAG} ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:latest
-  //           docker tag ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:${FULL_TAG} ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:latest
-
-  //           docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-api:latest
-  //           docker push ${REGISTRY_URL}/${REGISTRY_REPO}/calendar-app-web:latest
-  //         '''
-  //       }
-  //     }
-  //   }
+    stage('Deploy') {
+        steps {
+            // SSH command to deploy
+            sh 'ssh nas "cd /volume2/docker/calendar-app ; sudo docker compose pull ; sudo docker compose up -d"'
+        }
+    }
 
 
 
