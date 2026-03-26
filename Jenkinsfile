@@ -129,13 +129,14 @@ pipeline {
   post {
     always {
       sh 'docker logout ${REGISTRY_URL} || true'
-      sh '''
-        curl -s \
-          --form-string "token=123" \
-          --form-string "user=123" \
-          --form-string "message=build completed for calendar-app" \
-          https://api.pushover.net/1/messages.json
-      '''
+      withCredentials([string(credentialsId: 'Pushover', variable: 'PUSHOVER_TOKEN')]) {
+        sh '''
+          curl -s \
+            --form-string "token=${PUSHOVER_TOKEN}" \
+            --form-string "user=123" \
+            --form-string "message=build completed for calendar-app" \
+            https://api.pushover.net/1/messages.json
+        '''
     }
   }
 }
