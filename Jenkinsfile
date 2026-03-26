@@ -146,8 +146,8 @@ pipeline {
     }
     failure {
       withCredentials([
-        string(credentialsId: 'pushover', variable: 'PUSHOVER_TOKEN'),
-        string(credentialsId: 'pushover-user', variable: 'PUSHOVER_USER')
+        string(credentialsId: 'Pushover', variable: 'PUSHOVER_TOKEN'),
+        string(credentialsId: 'Pushover-User', variable: 'PUSHOVER_USER')
       ]) {
         sh '''
           curl -s \
