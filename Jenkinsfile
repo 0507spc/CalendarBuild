@@ -126,21 +126,37 @@ pipeline {
   }
 
 
-  post {
+    post {
     always {
       sh 'docker logout ${REGISTRY_URL} || true'
+    }
+    success {
       withCredentials([
-        string(credentialsId: 'Pushover', variable: 'PUSHOVER_TOKEN'),
-        string(credentialsId: 'Pushover-User', variable: 'PUSHOVER_USER')
+        string(credentialsId: 'pushover', variable: 'PUSHOVER_TOKEN'),
+        string(credentialsId: 'pushover-user', variable: 'PUSHOVER_USER')
       ]) {
         sh '''
           curl -s \
             --form-string "token=${PUSHOVER_TOKEN}" \
             --form-string "user=${PUSHOVER_USER}" \
-            --form-string "message=build completed for calendar-app" \
+            --form-string "message=Build succeeded for calendar-app" \
             https://api.pushover.net/1/messages.json
         '''
+      }
+    }
+    failure {
+      withCredentials([
+        string(credentialsId: 'pushover', variable: 'PUSHOVER_TOKEN'),
+        string(credentialsId: 'pushover-user', variable: 'PUSHOVER_USER')
+      ]) {
+        sh '''
+          curl -s \
+            --form-string "token=${PUSHOVER_TOKEN}" \
+            --form-string "user=${PUSHOVER_USER}" \
+            --form-string "message=Build failed for calendar-app" \
+            https://api.pushover.net/1/messages.json
+        '''
+      }
     }
   }
-}
 }
